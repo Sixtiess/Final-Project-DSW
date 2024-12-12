@@ -53,7 +53,7 @@ def inject_logged_in():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('login.html')
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -81,7 +81,7 @@ def authorized():
             session.clear()
             print(inst)
             message = 'Unable to login, please try again.', 'error'
-    return render_template('message.html', message=message)
+    return render_template('profile.html')
 
 
 @app.route('/page1')
