@@ -93,7 +93,7 @@ def renderShop():
     return render_template('shop.html')
     
 @app.route('/play')
-def renderShop():
+def renderPlay():
     return render_template('play.html')
 
 #the tokengetter is automatically called to check who is logged in.
