@@ -84,17 +84,17 @@ def authorized():
     return render_template('profile.html')
 
 
-@app.route('/page1')
-def renderPage1():
-    if 'user_data' in session:
-        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
-    else:
-        user_data_pprint = '';
-    return render_template('page1.html',dump_user_data=user_data_pprint)
+@app.route('/profile')
+def renderProfile():
+    return render_template('profile.html',dump_user_data=user_data_pprint)
 
-@app.route('/page2')
-def renderPage2():
-    return render_template('page2.html')
+@app.route('/shop')
+def renderShop():
+    return render_template('shop.html')
+    
+@app.route('/play')
+def renderShop():
+    return render_template('play.html')
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
