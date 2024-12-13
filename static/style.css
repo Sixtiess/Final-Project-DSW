@@ -17,5 +17,51 @@
 
 #loginButton {
 	background-color: #037006;
-	outline-color: none;
+	border-color: #037006;
+}
+
+#profileBottomLeftContainer {
+	display: inline-flex;
+	position:bottom;
+}
+
+#profilePageLeft{
+	margin:20px;
+	width:50%;
+}
+
+.profilePageButton {
+	margin:10px;
+}
+
+#profileLogoutButton {
+	background-color: red;
+	border-color:red;
+}
+
+#profilePageRight {
+	margin:20px;
+	position: right;
+}
+
+#profilePage{
+	display: inline-flex;
+	width:100%;
+}
+
+#profileCosmeticsList {
+	list-style-type: none;
+}
+
+#profileCosmeticsContainer {
+	padding:20px;
+	border: 5px solid black;
+	border-radius: 10px;
+	width:120%;
+	height:75%;
+	display:block;
+}
+
+.profileCosmetic {
+	padding-top:50px;
 }
