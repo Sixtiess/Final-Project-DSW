@@ -70,6 +70,8 @@ def logout():
 
 @app.route('/login/authorized')
 def authorized():
+    
+    
     resp = github.authorized_response()
     if resp is None:
         session.clear()
@@ -79,11 +81,28 @@ def authorized():
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
             message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
+            
+            # Checking if the user exists or if they are a new user, and adding them to the database if they are
+            ids = []
+            for user in users.find():
+                ids.append(user['uid'])
+            
+            if not session['user_data']['id'] in ids:
+                name = session['user_data']['login']
+                new_user = {
+                    'name': name, 
+                    'coins': 0, 
+                    'uid': session['user_data']['id']
+                }
+                users.insert_one(new_user)
+                print("Added new user " + name + " to database")
+                
         except Exception as inst:
             session.clear()
             print(inst)
             message = 'Unable to login, please try again.', 'error'
-    return render_template('profile.html')
+            return redirect('/')
+    return redirect('/profile')
 
 
 @app.route('/profile')
@@ -94,6 +113,7 @@ def renderProfile():
 
 @app.route('/shop')
 def renderShop():
+    coins = getCoins()
     if 'github_token' not in session:
         return redirect('/login')
     return render_template('shop.html')
@@ -107,6 +127,27 @@ def renderPlay():
 def get_github_oauth_token():
     return session['github_token']
 
+
+def getCoins():
+    if 'github_token' not in session:
+        session['coins'] = 0
+        return 0
+    
+    if 'coins' not in session:
+        session['coins'] = -1
+    
+    for i in users.find({'uid':session['user_data']['id']}):
+        user = i
+    
+    
+    try:
+        session['coins'] = user['coins']
+        return user['coins']
+    except:
+        session['coins'] = 0
+        return 0
+    
+    
 
 if __name__ == '__main__':
     app.run()
