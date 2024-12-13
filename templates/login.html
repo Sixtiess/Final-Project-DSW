@@ -3,10 +3,15 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
+<div class="center" id="loginTitleContainer">
+	<h1>Card Game</h1>
+</div>
 <form action="/login">
-  <button type="submit">Log In</button>
+	<div class="center" id="loginButtonContainer">
+		<button id="loginButton" class="btn btn-primary" type="submit" >Log In</button>
+	</div>
 </form>
-  <p>Lorem ipsum dolor sit amet.</p>
+  
   
 
 {% endblock %}
