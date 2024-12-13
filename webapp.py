@@ -53,11 +53,13 @@ def inject_logged_in():
 
 @app.route('/')
 def home():
+    if 'github_token' in session:
+        return redirect('/profile')
     return render_template('login.html')
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
-def login():   
+def login():
     return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
 
 @app.route('/logout')
@@ -86,10 +88,14 @@ def authorized():
 
 @app.route('/profile')
 def renderProfile():
+    if 'github_token' not in session:
+        return redirect('/login')
     return render_template('profile.html')
 
 @app.route('/shop')
 def renderShop():
+    if 'github_token' not in session:
+        return redirect('/login')
     return render_template('shop.html')
     
 @app.route('/play')
