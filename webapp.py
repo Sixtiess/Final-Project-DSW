@@ -86,7 +86,7 @@ def authorized():
 
 @app.route('/profile')
 def renderProfile():
-    return render_template('profile.html',dump_user_data=user_data_pprint)
+    return render_template('profile.html')
 
 @app.route('/shop')
 def renderShop():
