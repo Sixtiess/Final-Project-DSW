@@ -3,23 +3,51 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-
-	<h1>This is your profile page</h1>
-
-	<p>This is a template.</p>
-  
-	<form action="/play">
-		<button type="submit">Play</button>
-	</form>
+<div id="profilePage">
+	<div id="profilePageLeft">
+		<h1>Your Profile:</h1>
+		<br>
+		<br>
+		<!-- <img src="none yet"> -->
+		<p>Profile picture here:</p>
+		<br>
+		<br>
+		<h3>Username: __________</h3>
+		<br>
+		<br>
+		<br>
+		<form action="/logout">
+			<button class="btn btn-primary" id="profileLogoutButton" type="submit">Logout</button>
+		</form>
+		<br>
+		<br>
+		<br>
+		<div id="profileBottomLeftContainer">
+		
+			<form class="profilePageButton" action="/play">
+				<button class="btn btn-primary" type="submit">Play</button>
+			</form>
+			
+			<form class="profilePageButton" action="/shop">
+				<button class="btn btn-primary" type="submit">Shop</button>
+			</form>
+		
+		</div>
+	</div>
 	
-	<form action="/shop">
-		<button type="submit">Shop</button>
-	</form>
-	
-	<br>
-	
-	<form action="/logout">
-		<button type="submit">Logout</button>
-	</form>
+	<div id="profilePageRight">
+		<br>
+		<h2>Your Cosmetics:</h2>
+		<br>
+		<br>
+		<div id="profileCosmeticsContainer">
+			<ul id="profileCosmeticsList">
+				<div><li class="profileCosmetic"><h5>Card Back: _______________</h5></li></div>
+				<div><li class="profileCosmetic"><h5>Profile Border: _______________</h5></li></div>
+				<div><li class="profileCosmetic"><h5>Background: _______________</h5></li></div>
+			</ul>
+		</div>
+	</div>
+</div>	
 
 {% endblock %}
