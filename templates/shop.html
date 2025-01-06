@@ -1,14 +1,56 @@
 {% extends "layout.html" %}
 
-{% set active_page = "shop" %}
-
 {% block title %}Shop{% endblock %}
 
 {% block content %}
 
-  <h1>This is the shop page</h1>
-
-  <p>Lorem ipsum</p>
+  <h1 class="center">Shop</h1>
+  <br>
+  <br>
+  <br>
+  
+  <br>
+  <div id="shopItemContainer">
+	<div class="center shopItem">
+		<div class="center shopItemCard">
+			<h3>Item: ____ coins</h3>
+			<div class="center shopItemImage">
+				<!-- <img src=""> -->
+			</div>
+			<form action="/buy">
+				<button type="submit">Buy</button>
+				<!-- <input type="hidden" name="itemBought" value="whateverthefucktheitemidis"> -->
+			</form>
+		</div>
+	</div>
+	<div class="center shopItem">
+		<div class="center shopItemCard">
+			<h3>Item: ____ coins</h3>
+			<div class="center shopItemImage">
+				<!-- <img src=""> -->
+			</div>
+			<form action="/buy">
+				<button type="submit">Buy</button>
+				<!-- <input type="hidden" name="itemBought" value="whateverthefucktheitemidis"> -->
+			</form>
+		</div>
+	</div>
+	<div class="center shopItem">
+		<div class="center shopItemCard">
+			<h3>Item: ____ coins</h3>
+			<div class="center shopItemImage">
+				<!-- <img src=""> -->
+			</div>
+			<form action="/buy">
+				<button type="submit">Buy</button>
+				<!-- <input type="hidden" name="itemBought" value="whateverthefucktheitemidis"> -->
+			</form>
+		</div>
+	</div>
+	
+  </div>
+  
+  
   
 	<form action="/profile">
 		<button type="submit">Profile</button>
