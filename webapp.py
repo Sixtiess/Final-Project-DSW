@@ -36,6 +36,7 @@ url = os.environ["MONGO_CONNECTION_STRING"]
 client = pymongo.MongoClient(url)
 db = client[os.environ["MONGO_DBNAME"]]
 users = db['Users']
+games = db['Games']
 
 # Send a ping to confirm a successful connection
 try:
@@ -120,8 +121,16 @@ def renderShop():
     
 @app.route('/play')
 def renderPlay():
-    player_cards = {"AH", "KS"}
-    return render_template('play.html', player_cards=player_cards)
+    game = None
+    for i in games.find({'playerid':session['user_data']['id']}):
+        game = i
+    
+    if game:
+        player_cards = game["player_hand"]
+        return render_template('play.html', player_hand=player_cards)
+    else:
+        startGame()
+        redirect('/play')
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
@@ -190,6 +199,12 @@ def setCoins(amount):
         return False
 
 
+
+def startGame():
+    botHand = getCards(2, None)
+    playerHand = getCards(2, botHand)
+    newGame = {"playerid": session['user_data']['id'], "bot_hand": botHand, "player_hand": player_hand}
+    games.insert_one(newGame)
 
 if __name__ == '__main__':
     app.run()
