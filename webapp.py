@@ -148,6 +148,17 @@ def getCoins():
         return 0
     
     
+@app.route('/buy',methods=['POST'])
+def buyItem():
+    if getCoins() >= int(request.form["itemValue"]):
+        # addCoins(int(request.form["itemValue"]))
+        print("Bought "+request.form["boughtItemId"]+" Successfully!")
+    else:
+        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
+    return redirect('/shop',code=302)
+
+
+
 
 if __name__ == '__main__':
     app.run()

@@ -80,9 +80,14 @@
 }
 
 .shopItemCard {
-	display:flex;
+	display:block;
 	height:95%;
 	width: 95%;
 	border: 5px solid black;
 	border-radius:10px;
+}
+
+.shopItemImage{
+	width: 50%;
+	justify-content: center;
 }
