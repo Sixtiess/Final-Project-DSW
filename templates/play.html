@@ -16,7 +16,7 @@
 	<!-- <div class="hand hhand" data-hand="inline-flex: horizontal; spacing: 1.0; width: 90; cards: BLUE_BACK,AS,KS,9H,4C"></div> -->
 	
 	<!-- Using this method for showing a hand because, despite being a bit more complicated, it can show card backs, which is important for the game -->
-	<div class="hand active-hand hhand"> <!--active-hand class not necessary--> 
+	<div class="hand hhand">
 		<img class="card" src="static/cards/AS.svg">
 		<img class="card" src="static/cards/KS.svg">
 		<img class="card" src="static/cards/QS.svg">
@@ -29,9 +29,9 @@
 	
 	
 	<!-- Player's hand -->
-	<div class="player-hand active-hand hhand">
+	<div class="player-hand hhand">
 		{% for card in player_hand %}
-		<img class="card" src="static/cards/{{ card.name }}.svg">
+		<img class="card" src="static/cards/{{ card }}.svg">
 		{% endfor %}
 	</div>
 	

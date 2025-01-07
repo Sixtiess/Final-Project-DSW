@@ -120,7 +120,8 @@ def renderShop():
     
 @app.route('/play')
 def renderPlay():
-    return render_template('play.html')
+    player_cards = {"AH", "KS"}
+    return render_template('play.html', player_cards=player_cards)
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
