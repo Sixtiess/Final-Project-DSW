@@ -65,3 +65,8 @@
 .profileCosmetic {
 	padding-top:50px;
 }
+
+
+.card {
+	display: inline-flex;
+}
