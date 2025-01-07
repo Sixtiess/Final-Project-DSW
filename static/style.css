@@ -65,3 +65,29 @@
 .profileCosmetic {
 	padding-top:50px;
 }
+
+#shopItemContainer {
+	display: block;
+	width:100%;
+	height:400px;
+}
+
+.shopItem {
+	display:inline-flex;
+	width:33%;
+	height:100%;
+	
+}
+
+.shopItemCard {
+	display:block;
+	height:95%;
+	width: 95%;
+	border: 5px solid black;
+	border-radius:10px;
+}
+
+.shopItemImage{
+	width: 50%;
+	justify-content: center;
+}
