@@ -146,8 +146,7 @@ def getCoins():
     except:
         session['coins'] = 0
         return 0
-    
-       
+   
    
 def addCoins(amount):
     if 'github_token' not in session:
@@ -180,6 +179,8 @@ def setCoins(amount):
     for i in users.find({'uid':session['user_data']['id']}):
         user = i
     
+    for i in users.find({'uid':session['user_data']['id']}):
+        user = i
     
     try:
         query = {'uid':session['user_data']['id']}
@@ -198,7 +199,6 @@ def buyItem():
     else:
         print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
     return redirect('/shop',code=302)
-
 
 
 
