@@ -147,11 +147,53 @@ def getCoins():
         session['coins'] = 0
         return 0
     
+       
+   
+def addCoins(amount):
+    if 'github_token' not in session:
+        return False
     
+    if 'coins' not in session:
+        return False
+    
+    for i in users.find({'uid':session['user_data']['id']}):
+        user = i
+    
+    
+    try:
+        newAmount = session['coins'] + amount;
+        query = {'uid':session['user_data']['id']}
+        changes = {'$set': {'coins': newAmount}}
+        users.update_one(query, changes)
+        return True
+    except:
+        return False
+
+
+def setCoins(amount):
+    if 'github_token' not in session:
+        return False
+    
+    if 'coins' not in session:
+        return False
+    
+    for i in users.find({'uid':session['user_data']['id']}):
+        user = i
+    
+    
+    try:
+        query = {'uid':session['user_data']['id']}
+        changes = {'$set': {'coins': amount}}
+        users.update_one(query, changes)
+        return True
+    except:
+        return False
+        
+        
 @app.route('/buy',methods=['POST'])
 def buyItem():
     if getCoins() >= int(request.form["itemValue"]):
-        # addCoins(int(request.form["itemValue"]))
+        addCoins(int(request.form["itemValue"]))
         print("Bought "+request.form["boughtItemId"]+" Successfully!")
     else:
         print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
