@@ -3,10 +3,18 @@
 {% block title %}Play{% endblock %}
 
 {% block content %}
-
+	
+	<script src="static/cardsJS/cards.js"></script>
+	
 	<h1>Play</h1>
 	<form action="/profile">
 		<button type="submit">Stop Playing</button>
 	</form>
+	<br>
+	
+	<div class="center">
+		<p class="hand" data-hand="flow: horizontal; cards: AH,KH,QH,3H,2H"></p>
+		<!-- <p class="hand" data-hand="flow: horizontal; cards: AH,KH,QH,3H,2H"></p> -->
+	</div>
 	
 {% endblock %}
