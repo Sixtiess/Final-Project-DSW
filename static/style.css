@@ -91,3 +91,11 @@
 	width: 50%;
 	justify-content: center;
 }
+
+.profilePhoto {
+	width:200px;
+	mask-size:200px;
+	-webkit-mask-image: url(circleMask.png);
+	mask-image: url(circleMask.png);
+	mask-repeat: no-repeat;
+}
