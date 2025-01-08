@@ -127,7 +127,7 @@ def authorized():
 def renderProfile():
     if 'github_token' not in session:
         return redirect('/login')
-    return render_template('profile.html')
+    return render_template('profile.html',profilePhoto=session['user_data']["avatar_url"], username=session['user_data']["login"])
 
 @app.route('/shop')
 def renderShop():
@@ -235,6 +235,8 @@ def setCoins(amount):
     for i in users.find({'uid':session['user_data']['id']}):
         user = i
     
+    for i in users.find({'uid':session['user_data']['id']}):
+        user = i
     
     try:
         query = {'uid':session['user_data']['id']}
@@ -243,6 +245,16 @@ def setCoins(amount):
         return True
     except:
         return False
+        
+        
+@app.route('/buy',methods=['POST'])
+def buyItem():
+    if getCoins() >= int(request.form["itemValue"]):
+        addCoins(int(request.form["itemValue"]))
+        print("Bought "+request.form["boughtItemId"]+" Successfully!")
+    else:
+        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
+    return redirect('/shop',code=302)
 
 
 
