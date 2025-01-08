@@ -171,6 +171,9 @@ def stopPlaying():
 
 @app.route('/new_game')
 def newGame():
+    # TODO: Add a check for whether the player's game is done, and keep them on the same game if they press the button but aren't done, since if they could press the button
+    # and start a new game, without being done with their current one, they could just start a ton of new games until they start with a really good hand
+    # if done:
     games.delete_one({'playerid':session['user_data']['id']})
     return redirect('/play')
 
@@ -252,6 +255,7 @@ def startGame():
 def getCards(numCards, usedCards):
     cards = []
     newDeck = copy.deepcopy(deck) # Making a deep copy to manipulate to prevent the deck List from changing
+    random.shuffle(newDeck)
     
     if usedCards is not None:
         for i in usedCards:
