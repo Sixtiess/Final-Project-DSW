@@ -4,17 +4,64 @@
 
 {% block content %}
 	
-	<script src="static/cardsJS/cards.js"></script>
+	
+	<!-- All cards are from Richard Schneider's cardJS library on GitHub: https://github.com/richardschneider/cardsJS -->
+	<link rel="stylesheet" type="text/css" href="https://unpkg.com/cardsJS/dist/cards.min.css" />
+
+	<script src="https://unpkg.com/cardsJS/dist/cards.min.js" type="text/javascript"></script>
 	
 	<h1>Play</h1>
-	<form action="/profile">
-		<button type="submit">Stop Playing</button>
+	
+	<!-- Alternate way to show a hand -->
+	<!-- <div class="hand hhand" data-hand="inline-flex: horizontal; spacing: 1.0; width: 90; cards: BLUE_BACK,AS,KS,9H,4C"></div> -->
+	
+	<!-- Using this method for showing a hand because, despite being a bit more complicated, it can show card backs, which is important for the game -->
+	<!-- <div class="hand hhand"> -->
+		<!-- <img class="card" src="static/cards/AS.svg"> -->
+		<!-- <img class="card" src="static/cards/KS.svg"> -->
+		<!-- <img class="card" src="static/cards/QS.svg"> -->
+		<!-- <img class="card" src="static/cards/JS.svg"> -->
+		<!-- <img class="card" src="static/cards/10S.svg"> -->
+		<!-- <img class="card" src="static/cards/9H.svg"> -->
+		<!-- <img class="card" src="static/cards/3H.svg"> -->
+		<!-- <img class="card" src="static/cards/BLUE_BACK.svg"> -->
+		<!-- <br> -->
+	<!-- </div> -->
+	
+	
+	<!-- Bot's hand -->
+	<div class="bot-hand hhand">
+		{% for i in range(bot_hand|length) %}
+		{% if i == 0 %}
+		{% if not revealed %}
+		<img class="card" src="static/cards/BLUE_BACK.svg">
+		{% else %}
+		<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
+		{% endif %}
+		{% else %}
+		<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
+		{% endif %}
+		{% endfor %}
+	</div>
+	<br>
+	
+	<!-- Player's hand -->
+	<div class="player-hand hhand">
+		{% for card in player_hand %}
+		<img class="card" src="static/cards/{{ card }}.svg">
+		{% endfor %}
+	</div>
+	
+	<br>
+	<br>
+	<form action="/stop_playing">
+		<button type="submit">Exit</button>
+	</form>
+	<br>
+	<form action="/new_game">
+		<button type="submit">New Game</button>
 	</form>
 	<br>
 	
-	<div class="center">
-		<p class="hand" data-hand="flow: horizontal; cards: AH,KH,QH,3H,2H"></p>
-		<!-- <p class="hand" data-hand="flow: horizontal; cards: AH,KH,QH,3H,2H"></p> -->
-	</div>
 	
 {% endblock %}
