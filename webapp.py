@@ -157,8 +157,8 @@ def renderPlay():
         
         # session["player_hand"] = player_cards
         # session["bot_hand"] = bot_cards
-        
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards)
+        # Set revealed to True when the player stands, this will reveal the bot's second card
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=False)
     else:
         startGame()
         return redirect('/play')
@@ -167,6 +167,13 @@ def renderPlay():
 def stopPlaying():
     # placeholder
     return redirect('/profile')
+
+
+@app.route('/new_game')
+def newGame():
+    games.delete_one({'playerid':session['user_data']['id']})
+    return redirect('/play')
+
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
