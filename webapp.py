@@ -146,21 +146,29 @@ def renderPlay():
     # if "player_hand" not in session:
         # session["player_hand"] = []
     
-    
+    if "playing" not in session:
+        session["playing"] = True
     
     for i in games.find({'playerid':session['user_data']['id']}):
         game = i
     
     if game:
+        playing = True
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
         
         # session["player_hand"] = player_cards
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=False)
+        
+        if getHandValue(player_cards) == 21:
+            playing = False
+        
+        session["playing"] = playing
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=False, playing=playing)
     else:
         startGame()
+        session["playing"] = False
         return redirect('/play')
 
 @app.route('/stop_playing')
@@ -176,6 +184,49 @@ def newGame():
     # if done:
     games.delete_one({'playerid':session['user_data']['id']})
     return redirect('/play')
+
+
+# Intending to use AJAX later to prevent the entire webpage from reloading for the user every time they choose hit or stand
+@app.route('/action', methods=['POST'])
+def action():
+    userAction = request.form["action"]
+    playing = session["playing"]
+    
+    
+    
+    for i in games.find({'playerid':session['user_data']['id']}):
+        game = i
+    
+    if game:
+        player_cards = game["player_hand"]
+        bot_cards = game["bot_hand"]
+    else:
+        startGame()
+        session["playing"] = False
+        return redirect('/play')
+    
+    
+    if not playing:
+        revealed = True
+        # bot_cards, gameOver = botAction(player_cards, bot_cards)
+        # updateBotHand(game, bot_cards)
+        
+        
+    else:
+        player_cards, gameOver = playerAction(userAction, player_cards, bot_cards)
+        updatePlayerHand(game, player_cards)
+    
+    
+    return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
+
+@app.route('/buy',methods=['POST'])
+def buyItem():
+    if getCoins() >= int(request.form["itemValue"]):
+        addCoins(int(request.form["itemValue"]))
+        print("Bought "+request.form["boughtItemId"]+" Successfully!")
+    else:
+        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
+    return redirect('/shop',code=302)
 
 
 #the tokengetter is automatically called to check who is logged in.
@@ -247,14 +298,6 @@ def setCoins(amount):
         return False
         
         
-@app.route('/buy',methods=['POST'])
-def buyItem():
-    if getCoins() >= int(request.form["itemValue"]):
-        addCoins(int(request.form["itemValue"]))
-        print("Bought "+request.form["boughtItemId"]+" Successfully!")
-    else:
-        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
-    return redirect('/shop',code=302)
 
 
 
@@ -263,6 +306,8 @@ def startGame():
     playerHand = getCards(2, botHand)
     newGame = {"playerid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
     games.insert_one(newGame)
+
+
 
 def getCards(numCards, usedCards):
     cards = []
@@ -284,6 +329,89 @@ def getCards(numCards, usedCards):
         
     
     return cards
+
+
+# Updates the player's hand on MongoDB
+def updatePlayerHand(game, hand):
+    changes = {'$set':{"player_hand": hand}}
+    games.update_one(game, changes)
+
+
+# Updates the bot's hand on MongoDB
+def updateBotHand(game, hand):
+    changes = {'$set':{"bot_hand": hand}}
+    games.update_one(game, changes)
+
+
+
+
+# Returns the next game state when the player takes a given action (either hit or stand, for now -- will probably add double and split options later)
+# Returns -1 if player has busted, or returns the player's new hand if not along with a boolean for whether or not the bot should take its action
+def playerAction(action, playerHand, botHand):
+    if action == "hit":
+        playerHand += getCards(1, playerHand + botHand)
+        value = getHandValue(playerHand)
+        if value == 21:
+            return playerHand, True
+        else if value > 21:
+            return -1
+        else:
+            return playerHand, False
+    
+    if action == "stand":
+        value = getHandValue(playerHand)
+        if value == 21:
+            return playerHand, True
+        else:
+            return playerHand, False
+    
+    
+# Returns 
+# def botAction(playerHand, botHand):
+    
+    
+    
+    
+
+# Gets the value of a single card, returns 11 by default for an ace and 10 for face cards
+def getCardValue(card):
+    value = card[0]
+    
+    if value == 'A':
+        return 11
+    if value == 'K':
+        return 10
+    if value == 'Q':
+        return 10
+    if value == 'J':
+        return 10
+    if value == 'T':
+        return 10
+    
+    return int(value)
+    
+    
+
+# Gets the value of a given hand of cards, uses 1 or 11 for an ace depending on the value of the rest of the hand, with 11 as default
+def getHandValue(hand):
+    value = 0
+    aces = []
+    
+    for card in hand:
+        if card[0] != 'A':
+            value += getCardValue(card)
+        else:
+            aces.append(card)
+    
+    for ace in aces:
+        if value + 11 > 21:
+            value += 1
+        else:
+            value += 11
+    
+    
+    return value
+
 
 
 if __name__ == '__main__':

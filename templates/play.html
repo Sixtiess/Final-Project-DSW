@@ -53,6 +53,25 @@
 	</div>
 	
 	<br>
+	
+	{% if playing %}
+	<form action="/action" method="post">
+		<input type="hidden" name="action" value="hit"></input>
+		<button type="submit">Hit</button>
+	</form>
+	
+	<form action="/action" method="post">
+		<input type="hidden" name="action" value="stand"></input>
+		<button type="submit">Stand</button>
+	</form>
+	
+	<meta id="playing" content="true">
+	{% else %}
+	<meta id="playing" content="false">
+	{% endif %}
+	
+	
+	
 	<br>
 	<form action="/stop_playing">
 		<button type="submit">Exit</button>
