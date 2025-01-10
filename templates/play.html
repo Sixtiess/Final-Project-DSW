@@ -55,15 +55,11 @@
 	<br>
 	
 	{% if playing %}
-	<form action="/action" method="post">
-		<input type="hidden" name="action" value="hit"></input>
-		<button type="submit">Hit</button>
-	</form>
-	
-	<form action="/action" method="post">
-		<input type="hidden" name="action" value="stand"></input>
-		<button type="submit">Stand</button>
-	</form>
+
+		<button class="actionButton" value="hit">Hit</button>
+
+		<button class="actionButton" value="stand">Stand</button>
+
 	
 	<meta id="playing" content="true">
 	{% else %}

@@ -136,7 +136,7 @@ def renderShop():
         return redirect('/login')
     return render_template('shop.html')
     
-@app.route('/play')
+@app.route('/play',methods=['POST'])
 def renderPlay():
     game = None
     
@@ -157,6 +157,9 @@ def renderPlay():
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
         
+        if "action" in request.form:
+            new_cards, playing = playerAction(request.form['action'],player_cards,bot_cards)
+            player_cards = new_cards
         # session["player_hand"] = player_cards
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
@@ -347,14 +350,15 @@ def updateBotHand(game, hand):
 
 # Returns the next game state when the player takes a given action (either hit or stand, for now -- will probably add double and split options later)
 # Returns -1 if player has busted, or returns the player's new hand if not along with a boolean for whether or not the bot should take its action
+#Returns 0 if the player takes no action
 def playerAction(action, playerHand, botHand):
     if action == "hit":
         playerHand += getCards(1, playerHand + botHand)
         value = getHandValue(playerHand)
         if value == 21:
             return playerHand, True
-        else if value > 21:
-            return -1
+        elif value > 21:
+            return -1,-1
         else:
             return playerHand, False
     
@@ -365,6 +369,7 @@ def playerAction(action, playerHand, botHand):
         else:
             return playerHand, False
     
+    return 0,0
     
 # Returns 
 # def botAction(playerHand, botHand):
