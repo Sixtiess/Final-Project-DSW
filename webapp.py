@@ -127,7 +127,7 @@ def authorized():
 def renderProfile():
     if 'github_token' not in session:
         return redirect('/login')
-    return render_template('profile.html',profilePhoto=session['user_data']["avatar_url"], username=session['user_data']["login"])
+    return render_template('profile.html', profilePhoto=session['user_data']["avatar_url"], username=session['user_data']["login"])
 
 @app.route('/shop')
 def renderShop():
