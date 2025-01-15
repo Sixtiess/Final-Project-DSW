@@ -136,10 +136,10 @@ def renderShop():
         return redirect('/login')
     return render_template('shop.html')
     
-@app.route('/play',methods=['POST'])
+@app.route('/play',methods=['GET','POST'])
 def renderPlay():
     game = None
-    
+
     # These cookies store the bot and player hands, however they may not be necessary since the player is not ever actually playing a card
     # if "bot_hand" not in session:
         # session["bot_hand"] = []
@@ -156,10 +156,8 @@ def renderPlay():
         playing = True
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
+
         
-        if "action" in request.form:
-            new_cards, playing = playerAction(request.form['action'],player_cards,bot_cards)
-            player_cards = new_cards
         # session["player_hand"] = player_cards
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
@@ -192,7 +190,6 @@ def newGame():
 # Intending to use AJAX later to prevent the entire webpage from reloading for the user every time they choose hit or stand
 @app.route('/action', methods=['POST'])
 def action():
-    userAction = request.form["action"]
     playing = session["playing"]
     
     
@@ -203,6 +200,12 @@ def action():
     if game:
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
+
+        userAction = request.form.get("action")
+        
+        new_cards, playing = playerAction(userAction,player_cards,bot_cards)
+        player_cards = new_cards
+        print(player_cards)
     else:
         startGame()
         session["playing"] = False
@@ -216,8 +219,9 @@ def action():
         
         
     else:
-        player_cards, gameOver = playerAction(userAction, player_cards, bot_cards)
+        # player_cards, gameOver = playerAction(userAction, player_cards, bot_cards)
         updatePlayerHand(game, player_cards)
+        revealed=False
     
     
     return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
@@ -352,13 +356,14 @@ def updateBotHand(game, hand):
 # Returns -1 if player has busted, or returns the player's new hand if not along with a boolean for whether or not the bot should take its action
 #Returns 0 if the player takes no action
 def playerAction(action, playerHand, botHand):
+    print(action)
     if action == "hit":
         playerHand += getCards(1, playerHand + botHand)
         value = getHandValue(playerHand)
         if value == 21:
             return playerHand, True
         elif value > 21:
-            return -1,-1
+            return playerHand,-1
         else:
             return playerHand, False
     
@@ -368,7 +373,6 @@ def playerAction(action, playerHand, botHand):
             return playerHand, True
         else:
             return playerHand, False
-    
     return 0,0
     
 # Returns 

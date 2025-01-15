@@ -10,12 +10,13 @@ $(document).ready(function() {
 		// });
 	// }
 	$(".actionButton").click(function(){
+		console.log($(this).value)
 		$.ajax({
 			type: "POST",
-			url:"/play",
-			data: { action : $(this).value}
-		});
+			url:"/action",
+			data: { "action" : $(this).val()}
+		})
 	
-		);
-	}
+		
+	});
 });
