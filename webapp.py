@@ -149,7 +149,7 @@ def renderPlay():
     if "playing" not in session:
         session["playing"] = True
     
-    for i in games.find({'playerid':session['user_data']['id']}):
+    for i in games.find({'uid':session['user_data']['id']}):
         game = i
     
     if game:
@@ -183,7 +183,7 @@ def newGame():
     # TODO: Add a check for whether the player's game is done, and keep them on the same game if they press the button but aren't done, since if they could press the button
     # and start a new game, without being done with their current one, they could just start a ton of new games until they start with a really good hand
     # if done:
-    games.delete_one({'playerid':session['user_data']['id']})
+    games.delete_one({'uid':session['user_data']['id']})
     return redirect('/play')
 
 
@@ -194,7 +194,7 @@ def action():
     new_cards = None
     
     
-    for i in games.find({'playerid':session['user_data']['id']}):
+    for i in games.find({'uid':session['user_data']['id']}):
         game = i
     
     if game:
@@ -312,7 +312,7 @@ def setCoins(amount):
 def startGame():
     botHand = getCards(2, None)
     playerHand = getCards(2, botHand)
-    newGame = {"playerid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
+    newGame = {"uid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
     games.insert_one(newGame)
 
 
@@ -343,6 +343,9 @@ def getCards(numCards, usedCards):
 def updatePlayerHand(hand):
     changes = {'$set':{"player_hand": hand}}
     query = {"uid":session["user_data"]["id"]}
+    
+    print(query)
+    print(games.find_one(query))
     games.update_one(query, changes)
     return True
 
