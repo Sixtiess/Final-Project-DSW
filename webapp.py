@@ -191,7 +191,7 @@ def newGame():
 @app.route('/action', methods=['POST'])
 def action():
     playing = session["playing"]
-    
+    new_cards = None
     
     
     for i in games.find({'playerid':session['user_data']['id']}):
@@ -204,8 +204,9 @@ def action():
         userAction = request.form.get("action")
         
         new_cards, playing = playerAction(userAction,player_cards,bot_cards)
-        player_cards = new_cards
-        print(player_cards)
+
+        if updatePlayerHand(new_cards):
+            print(game)
     else:
         startGame()
         session["playing"] = False
@@ -220,11 +221,11 @@ def action():
         
     else:
         # player_cards, gameOver = playerAction(userAction, player_cards, bot_cards)
-        updatePlayerHand(game, player_cards)
+        
         revealed=False
     
     
-    return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
+    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
 
 @app.route('/buy',methods=['POST'])
 def buyItem():
@@ -339,15 +340,18 @@ def getCards(numCards, usedCards):
 
 
 # Updates the player's hand on MongoDB
-def updatePlayerHand(game, hand):
+def updatePlayerHand(hand):
     changes = {'$set':{"player_hand": hand}}
-    games.update_one(game, changes)
+    query = {"uid":session["user_data"]["id"]}
+    games.update_one(query, changes)
+    return True
 
 
 # Updates the bot's hand on MongoDB
-def updateBotHand(game, hand):
+def updateBotHand(hand):
     changes = {'$set':{"bot_hand": hand}}
-    games.update_one(game, changes)
+    query = {"uid":session["user_data"]["id"]}
+    games.update_one(query, changes)
 
 
 
