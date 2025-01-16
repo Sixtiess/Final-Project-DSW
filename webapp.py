@@ -140,6 +140,7 @@ def renderShop():
 def renderPlay():
     game = None
 
+    revealed = True
     # These cookies store the bot and player hands, however they may not be necessary since the player is not ever actually playing a card
     # if "bot_hand" not in session:
         # session["bot_hand"] = []
@@ -153,7 +154,7 @@ def renderPlay():
         game = i
     
     if game:
-        playing = True
+        playing = session["playing"]
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
 
@@ -162,14 +163,16 @@ def renderPlay():
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
         
-        if getHandValue(player_cards) == 21:
+        if getHandValue(player_cards) >= 21:
             playing = False
+            session["playing"] = playing
         
-        session["playing"] = playing
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=False, playing=playing)
+        if playing:
+            revealed=False
+
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
     else:
         startGame()
-        session["playing"] = False
         return redirect('/play')
 
 @app.route('/stop_playing')
@@ -203,13 +206,17 @@ def action():
 
         userAction = request.form.get("action")
         
-        new_cards, playing = playerAction(userAction,player_cards,bot_cards)
-
+        new_cards, isPlaying = playerAction(userAction,player_cards,bot_cards)
+        if isPlaying == -1:
+            isPlaying = False
+            busted = True
+        playing = isPlaying
+        session["playing"] = isPlaying
+        print(isPlaying)
         updatePlayerHand(new_cards)
         
     else:
         startGame()
-        session["playing"] = False
         return redirect('/play')
     
     
@@ -314,6 +321,7 @@ def startGame():
     playerHand = getCards(2, botHand)
     newGame = {"uid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
     games.insert_one(newGame)
+    session["playing"] = True
 
 
 
@@ -344,8 +352,8 @@ def updatePlayerHand(hand):
     changes = {'$set':{"player_hand": hand}}
     query = {"uid":session["user_data"]["id"]}
     
-    print(query)
-    print(games.find_one(query))
+    # print(query)
+    # print(games.find_one(query))
     games.update_one(query, changes)
     return True
 
@@ -368,18 +376,15 @@ def playerAction(action, playerHand, botHand):
         playerHand += getCards(1, playerHand + botHand)
         value = getHandValue(playerHand)
         if value == 21:
-            return playerHand, True
+            return playerHand, False
         elif value > 21:
             return playerHand,-1
         else:
-            return playerHand, False
+            return playerHand, True
     
     if action == "stand":
         value = getHandValue(playerHand)
-        if value == 21:
-            return playerHand, True
-        else:
-            return playerHand, False
+        return playerHand, False
     return 0,0
     
 # Returns 
