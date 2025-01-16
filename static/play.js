@@ -14,10 +14,12 @@ $(document).ready(function() {
 		$.ajax({
 			type: "POST",
 			url:"/action",
-			data: { "action" : $(this).val()}
+			data: { "action" : $(this).val()},
+			success: function(){
+				$(".player-hand").load(location.href + " .player-hand"); //reloads player hand div when you click an action button
+			  }
 		});
-	
-		player_hand = $(".player-hand");
-		player_hand.ajax.reload();
+		
 	});
+	
 });
