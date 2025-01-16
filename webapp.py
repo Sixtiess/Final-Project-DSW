@@ -205,8 +205,8 @@ def action():
         
         new_cards, playing = playerAction(userAction,player_cards,bot_cards)
 
-        if updatePlayerHand(new_cards):
-            print(game)
+        updatePlayerHand(new_cards)
+        
     else:
         startGame()
         session["playing"] = False

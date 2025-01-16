@@ -54,16 +54,13 @@
 	
 	<br>
 	
-	{% if playing %}
-
-		<button class="actionButton" value="hit">Hit</button>
-		<button class="actionButton" value="stand">Stand</button>
-
+	<div id="actionButtonContainer">
+		{% if playing %}
+			<button class="actionButton" value="hit">Hit</button>
+			<button class="actionButton" value="stand">Stand</button>
+		{% endif %}
+	</div>
 	
-	<meta id="playing" content="true">
-	{% else %}
-	<meta id="playing" content="false">
-	{% endif %}
 	
 	
 	

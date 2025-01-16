@@ -17,9 +17,9 @@ $(document).ready(function() {
 			data: { "action" : $(this).val()},
 			success: function(){
 				$(".player-hand").load(location.href + " .player-hand"); //reloads player hand div when you click an action button
+				$("#actionButtonContainer").load(location.href + " #actionButtonContainer"); //reloads action buttons in case the player click stand
 			  }
 		});
 		
 	});
-	
 });
