@@ -11,10 +11,10 @@ $(document).ready(function() {
 			data: { "action" : $(this).val()},
 			success: function(data){
 				$(".player-hand").load(location.href + " .player-hand"); //reloads player hand div when you click an action button
-				$("#actionButtonContainer").load(location.href + " #actionButtonContainer"); //reloads action buttons in case the player click stand
+				$(".actionButtonContainer").load(location.href + " .actionButtonContainer"); //reloads action buttons in case the player click stand
 				console.log(data)
-				var $response = $(data).filter("#actionButtonContainer").html();
-				$("#actionButtonContainer").html($response);
+				var $response = $(data).filter(".actionButtonContainer").html();
+				$(".parentContainer").html($response);
 				console.log($response);
 			}
 		});
