@@ -162,8 +162,7 @@ def renderPlay():
         # session["player_hand"] = player_cards
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
-
-        # print(player_cards)
+        
         if getHandValue(player_cards) >= 21:
             playing = False
             session["playing"] = playing
@@ -206,17 +205,16 @@ def action():
         bot_cards = game["bot_hand"]
 
         userAction = request.form.get("action")
-        print(userAction)
+        
 
         new_cards, isPlaying = playerAction(userAction,player_cards,bot_cards)
         if isPlaying == -1:
             isPlaying = False
             busted = True
-        # if isPlaying == 0:
-        #     return redirect('/play')
+        
         playing = isPlaying
         session["playing"] = isPlaying
-        # print(isPlaying)
+        
         if new_cards != 0:
             updatePlayerHand(new_cards)
         else:
@@ -382,6 +380,7 @@ def playerAction(action, playerHand, botHand):
     if action == "hit":
         playerHand += getCards(1, playerHand + botHand)
         value = getHandValue(playerHand)
+        
         if value == 21:
             return playerHand, False
         elif value > 21:
@@ -413,7 +412,7 @@ def getCardValue(card):
         return 10
     if value == 'J':
         return 10
-    if value == 'T':
+    if card[0] + card[1] == '10':
         return 10
     
     return int(value)
