@@ -28,39 +28,45 @@
 		<!-- <br> -->
 	<!-- </div> -->
 	
-	<div class="parentContainer">
-		<div class="actionButtonContainer">
-			<!-- Bot's hand -->
-			<div class="bot-hand hhand">
-				{% for i in range(bot_hand|length) %}
-				{% if i == 0 %}
-				{% if not revealed %}
-				<img class="card" src="static/cards/BLUE_BACK.svg">
-				{% else %}
-				<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
-				{% endif %}
-				{% else %}
-				<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
-				{% endif %}
-				{% endfor %}
-			</div>
-			<br>
-		
-		
-			<!-- Player's hand -->
-			<div class="player-hand hhand">
-				{% for card in player_hand %}
-				<img class="card" src="static/cards/{{ card }}.svg">
-				{% endfor %}
-			</div>
-			
-			<br>
-			
-				{% if playing %}
-					<button class="actionButton" value="hit">Hit</button>
-					<button class="actionButton" value="stand">Stand</button>
-				{% endif %}
+	<div class="cardContainer">
+		<!-- Bot's hand -->
+		<div class="bot-hand hhand">
+			{% for i in range(bot_hand|length) %}
+			{% if i == 0 %}
+			{% if not revealed %}
+			<img class="card" src="static/cards/BLUE_BACK.svg">
+			{% else %}
+			<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
+			{% endif %}
+			{% else %}
+			<img class="card" src="static/cards/{{ bot_hand[i] }}.svg">
+			{% endif %}
+			{% endfor %}
 		</div>
+		<br>
+		
+		
+		<!-- Player's hand -->
+		<div class="player-hand hhand">
+			{% for card in player_hand %}
+			<img class="card" src="static/cards/{{ card }}.svg">
+			{% endfor %}
+		</div>
+		
+		<br>
+		
+	</div>
+
+	<div class="hitButtonContainer">
+			{% if playing %}
+				<button class="hitButton" value="hit">Hit</button>
+			{% endif %}
+	</div>
+
+	<div class="standButtonContainer">
+		{% if playing %}
+			<button class="standButton" value="stand">Stand</button>
+		{% endif %}
 	</div>
 	
 	
