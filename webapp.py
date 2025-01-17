@@ -195,8 +195,10 @@ def newGame():
 def action():
     playing = session["playing"]
     new_cards = None
-    
-    
+    gameOver = None
+    busted = False
+    revealed = False
+
     for i in games.find({'uid':session['user_data']['id']}):
         game = i
     
@@ -225,19 +227,23 @@ def action():
         return redirect('/play')
     
     
-    if not playing:
+    if not playing and not busted:
         revealed = True
-        # bot_cards, gameOver = botAction(player_cards, bot_cards)
-        # updateBotHand(game, bot_cards)
-        
-        
-    else:
-        # player_cards, gameOver = playerAction(userAction, player_cards, bot_cards)
-        
-        revealed=False
+        bot_cards, gameOver = botAction(player_cards, bot_cards)
+        updateBotHand(bot_cards)
     
+
+    winMessage = None
     
-    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
+    if gameOver == 1:
+        winMessage = "Bot wins!"
+    if gameOver == 0:
+        winMessage = "Tie!"
+    if gameOver == -1:
+        winMessage = "You win!"
+    
+
+    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage)
 
 @app.route('/buy',methods=['POST'])
 def buyItem():
@@ -393,9 +399,30 @@ def playerAction(action, playerHand, botHand):
         return playerHand, False
     return 0,0
     
-# Returns 
-# def botAction(playerHand, botHand):
+# Returns 1 if the bot won, -1 if it lost, and 0 if it tied, along with the bot's new hand
+def botAction(playerHand, botHand):
+    player = getHandValue(playerHand)
+    bot = getHandValue(botHand)
+    while bot <= 16:
+        botHand += getCards(1, playerHand + botHand)
+        bot = getHandValue(botHand)
     
+
+    
+    if bot > 21:
+        return botHand, -1
+    
+    if bot > player:
+        return botHand, 1
+    
+    if bot == player:
+        return botHand, 0
+    
+    if bot < player:
+        return botHand, -1
+    
+    return botHand, 0
+
     
     
     
