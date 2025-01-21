@@ -252,7 +252,7 @@ def action():
         session["gameOver"] = True
         winMessage = "Busted!"
         revealed = True
-
+    
     if gameOver == 1:
         winMessage = "Bot wins!"
     if gameOver == 0:
