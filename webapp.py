@@ -175,7 +175,7 @@ def renderPlay():
         else:
             revealedCards = []
             for i in range(len(bot_cards)):
-                if i != 1:
+                if i != 0:
                     revealedCards.append(bot_cards[i])
             botValue = getHandValue(revealedCards)
 
@@ -256,7 +256,7 @@ def action():
     else:
         revealedCards = []
         for i in range(len(bot_cards)):
-            if i != 1:
+            if i != 0:
                 revealedCards.append(bot_cards[i])
         botValue = getHandValue(revealedCards)
     
