@@ -170,8 +170,12 @@ def renderPlay():
         if playing:
             revealed=False
 
+
+        winMessage = session["winMessage"]
+
         if revealed:
             botValue = getHandValue(bot_cards)
+            session["gameOver"] = True
         else:
             revealedCards = []
             for i in range(len(bot_cards)):
@@ -179,7 +183,7 @@ def renderPlay():
                     revealedCards.append(bot_cards[i])
             botValue = getHandValue(revealedCards)
 
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, playerValue=getHandValue(player_cards), botValue=botValue)
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage, playerValue=getHandValue(player_cards), botValue=botValue)
     else:
         startGame()
         return redirect('/play')
@@ -195,7 +199,10 @@ def newGame():
     # TODO: Add a check for whether the player's game is done, and keep them on the same game if they press the button but aren't done, since if they could press the button
     # and start a new game, without being done with their current one, they could just start a ton of new games until they start with a really good hand
     # if done:
-    games.delete_one({'uid':session['user_data']['id']})
+    if "gameOver" in session:
+        gameOver = session["gameOver"]
+        if gameOver:
+            games.delete_one({'uid':session['user_data']['id']})     
     return redirect('/play')
 
 
@@ -235,14 +242,17 @@ def action():
         startGame()
         return redirect('/play')
     
+    winMessage = session["winMessage"]
     
     if not playing and not busted:
         revealed = True
         bot_cards, gameOver = botAction(player_cards, bot_cards)
         updateBotHand(bot_cards)
-    
+    if busted:
+        session["gameOver"] = True
+        winMessage = "Busted!"
+        revealed = True
 
-    winMessage = None
     
     if gameOver == 1:
         winMessage = "Bot wins!"
@@ -251,8 +261,11 @@ def action():
     if gameOver == -1:
         winMessage = "You win!"
     
+    session["winMessage"] = winMessage
+
     if revealed:
         botValue = getHandValue(bot_cards)
+        session["gameOver"] = True
     else:
         revealedCards = []
         for i in range(len(bot_cards)):
@@ -350,6 +363,8 @@ def startGame():
     newGame = {"uid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
     games.insert_one(newGame)
     session["playing"] = True
+    session["winMessage"] = ""
+    session["gameOver"] = False
 
 
 
