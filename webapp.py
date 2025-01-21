@@ -170,7 +170,16 @@ def renderPlay():
         if playing:
             revealed=False
 
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing)
+        if revealed:
+            botValue = getHandValue(bot_cards)
+        else:
+            revealedCards = []
+            for i in range(len(bot_cards)):
+                if i != 1:
+                    revealedCards.append(bot_cards[i])
+            botValue = getHandValue(revealedCards)
+
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, playerValue=getHandValue(player_cards), botValue=botValue)
     else:
         startGame()
         return redirect('/play')
@@ -242,8 +251,16 @@ def action():
     if gameOver == -1:
         winMessage = "You win!"
     
-
-    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage)
+    if revealed:
+        botValue = getHandValue(bot_cards)
+    else:
+        revealedCards = []
+        for i in range(len(bot_cards)):
+            if i != 1:
+                revealedCards.append(bot_cards[i])
+        botValue = getHandValue(revealedCards)
+    
+    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage, playerValue=getHandValue(new_cards), botValue=botValue)
 
 @app.route('/buy',methods=['POST'])
 def buyItem():
