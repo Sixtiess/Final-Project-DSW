@@ -139,7 +139,8 @@ def renderShop():
 @app.route('/play',methods=['GET','POST'])
 def renderPlay():
     game = None
-
+    if "winMessage" not in session:
+        session["winMessage"] = ""
     revealed = True
     # These cookies store the bot and player hands, however they may not be necessary since the player is not ever actually playing a card
     # if "bot_hand" not in session:
@@ -163,9 +164,17 @@ def renderPlay():
         # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
         
-        if getHandValue(player_cards) >= 21:
+        if getHandValue(player_cards) > 21 and playing:
             playing = False
             session["playing"] = playing
+            session["winMessage"] = "Bot wins!"
+            winMessage = "Bot wins!"
+        elif getHandValue(player_cards) == 21 and playing:
+            playing = False
+            session["playing"] = playing
+            session["winMessage"] = "You win!"
+            winMessage = "You win!"
+            addCoins(20)
         
         if playing:
             revealed=False
@@ -257,8 +266,10 @@ def action():
         winMessage = "Bot wins!"
     if gameOver == 0:
         winMessage = "Tie!"
+        addCoins(5)
     if gameOver == -1:
         winMessage = "You win!"
+        addCoins(10)
     
     session["winMessage"] = winMessage
 
@@ -315,14 +326,18 @@ def addCoins(amount):
         return False
     
     if 'coins' not in session:
-        return False
+        coins = getCoins()
+        if coins:
+            session["coins"] = coins
+        else:
+            session["coins"] = 0
     
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
-    
+    # for i in users.find({'uid':session['user_data']['id']}):
+    #     user = i
     
     try:
-        newAmount = session['coins'] + amount;
+        newAmount = int(session['coins']) + amount
+        session["coins"] = newAmount
         query = {'uid':session['user_data']['id']}
         changes = {'$set': {'coins': newAmount}}
         users.update_one(query, changes)
@@ -338,11 +353,11 @@ def setCoins(amount):
     if 'coins' not in session:
         return False
     
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
+    # for i in users.find({'uid':session['user_data']['id']}):
+    #     user = i
     
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
+    # for i in users.find({'uid':session['user_data']['id']}):
+    #     user = i
     
     try:
         query = {'uid':session['user_data']['id']}
