@@ -100,7 +100,7 @@ def authorized():
         try:
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
-            message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
+            # message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
             
             # Checking if the user exists or if they are a new user, and adding them to the database if they are
             ids = []
@@ -120,7 +120,7 @@ def authorized():
         except Exception as inst:
             session.clear()
             print(inst)
-            message = 'Unable to login, please try again.', 'error'
+            # message = 'Unable to login, please try again.', 'error'
             return redirect('/')
     return redirect('/profile')
 
@@ -161,9 +161,6 @@ def renderPlay():
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
 
-        
-        # session["player_hand"] = player_cards
-        # session["bot_hand"] = bot_cards
         # Set revealed to True when the player stands, this will reveal the bot's second card
         
         if getHandValue(player_cards) > 21 and playing:
@@ -334,9 +331,6 @@ def addCoins(amount):
         else:
             session["coins"] = 0
     
-    # for i in users.find({'uid':session['user_data']['id']}):
-    #     user = i
-    
     try:
         newAmount = int(session['coins']) + amount
         session["coins"] = newAmount
@@ -354,12 +348,6 @@ def setCoins(amount):
     
     if 'coins' not in session:
         return False
-    
-    # for i in users.find({'uid':session['user_data']['id']}):
-    #     user = i
-    
-    # for i in users.find({'uid':session['user_data']['id']}):
-    #     user = i
     
     try:
         query = {'uid':session['user_data']['id']}
@@ -420,9 +408,7 @@ def getCards(numCards, usedCards):
 def updatePlayerHand(hand):
     changes = {'$set':{"player_hand": hand}}
     query = {"uid":session["user_data"]["id"]}
-    
-    # print(query)
-    # print(games.find_one(query))
+
     games.update_one(query, changes)
     return True
 
@@ -440,7 +426,6 @@ def updateBotHand(hand):
 # Returns -1 if player has busted, or returns the player's new hand if not along with a boolean for whether or not the bot should take its action
 #Returns 0 if the player takes no action
 def playerAction(action, playerHand, botHand):
-    # print(action)
     if action == "hit":
         playerHand += getCards(1, playerHand + botHand)
         value = getHandValue(playerHand)
