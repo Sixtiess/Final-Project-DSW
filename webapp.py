@@ -54,6 +54,8 @@ deck = [
     # Spades
     "AS", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS"
 ]
+# book says hit on 20
+
 
 # Send a ping to confirm a successful connection
 try:
@@ -386,7 +388,17 @@ def getCards(numCards, usedCards):
     cards = []
     newDeck = copy.deepcopy(deck) # Making a deep copy to manipulate to prevent the deck List from changing
     random.shuffle(newDeck)
-    
+
+    # if session["user_data"]["id"] == 160991266:
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     return cards
+
     if usedCards is not None:
         for i in usedCards:
             newDeck.remove(i)
@@ -503,11 +515,20 @@ def getHandValue(hand):
         else:
             aces.append(card)
     
-    for ace in aces:
-        if value + 11 > 21:
+    # Should work better when handling many aces, however this isn't important unless there are multiple decks
+    numAces = len(aces)
+    while numAces > 0:
+        if value + (11 * numAces) > 21:
             value += 1
         else:
             value += 11
+        numAces -= 1
+    
+    # for ace in aces:
+    #     if value + 11 > 21:
+    #         value += 1
+    #     else:
+    #         value += 11
     
     
     return value
