@@ -288,7 +288,7 @@ def action():
 @app.route('/buy',methods=['POST'])
 def buyItem():
     if getCoins() >= int(request.form["itemValue"]):
-        addCoins(int(request.form["itemValue"]))
+        addCoins(-int(request.form["itemValue"]))
         print("Bought "+request.form["boughtItemId"]+" Successfully!")
     else:
         print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
