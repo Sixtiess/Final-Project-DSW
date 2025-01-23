@@ -15,6 +15,8 @@
 		<h3>Username: {{ username }}</h3>
 		<br>
 		<br>
+		<h3>Coins: {{ coins }}</h3>
+		<br>
 		<br>
 		<form action="/logout">
 			<button class="btn btn-primary" id="profileLogoutButton" type="submit">Logout</button>
@@ -24,7 +26,7 @@
 		<br>
 		<div id="profileBottomLeftContainer">
 		
-			<form class="profilePageButton" action="/play">
+			<form class="profilePageButton" action="/play" method="get">
 				<button class="btn btn-primary" type="submit">Play</button>
 			</form>
 			

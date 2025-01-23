@@ -54,6 +54,8 @@ deck = [
     # Spades
     "AS", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS"
 ]
+# book says hit on 20
+
 
 # Send a ping to confirm a successful connection
 try:
@@ -68,6 +70,10 @@ except Exception as e:
 @app.context_processor
 def inject_logged_in():
     return {"logged_in":('github_token' in session)}
+
+@app.context_processor
+def inject_coins():
+    return {"coins":(getCoins())}
 
 @app.route('/')
 def home():
@@ -98,7 +104,7 @@ def authorized():
         try:
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
-            message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
+            # message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
             
             # Checking if the user exists or if they are a new user, and adding them to the database if they are
             ids = []
@@ -118,7 +124,7 @@ def authorized():
         except Exception as inst:
             session.clear()
             print(inst)
-            message = 'Unable to login, please try again.', 'error'
+            # message = 'Unable to login, please try again.', 'error'
             return redirect('/')
     return redirect('/profile')
 
@@ -127,7 +133,7 @@ def authorized():
 def renderProfile():
     if 'github_token' not in session:
         return redirect('/login')
-    return render_template('profile.html',profilePhoto=session['user_data']["avatar_url"], username=session['user_data']["login"])
+    return render_template('profile.html', profilePhoto=session['user_data']["avatar_url"], username=session['user_data']["login"])
 
 @app.route('/shop')
 def renderShop():
@@ -136,29 +142,60 @@ def renderShop():
         return redirect('/login')
     return render_template('shop.html')
     
-@app.route('/play')
+@app.route('/play',methods=['GET','POST'])
 def renderPlay():
     game = None
-    
+    if "winMessage" not in session:
+        session["winMessage"] = ""
+    revealed = True
     # These cookies store the bot and player hands, however they may not be necessary since the player is not ever actually playing a card
     # if "bot_hand" not in session:
         # session["bot_hand"] = []
     # if "player_hand" not in session:
         # session["player_hand"] = []
     
+    if "playing" not in session:
+        session["playing"] = True
     
-    
-    for i in games.find({'playerid':session['user_data']['id']}):
+    for i in games.find({'uid':session['user_data']['id']}):
         game = i
     
     if game:
+        playing = session["playing"]
         player_cards = game["player_hand"]
         bot_cards = game["bot_hand"]
-        
-        # session["player_hand"] = player_cards
-        # session["bot_hand"] = bot_cards
+
         # Set revealed to True when the player stands, this will reveal the bot's second card
-        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=False)
+        
+        if getHandValue(player_cards) > 21 and playing:
+            playing = False
+            session["playing"] = playing
+            session["winMessage"] = "Bot wins!"
+            winMessage = "Bot wins!"
+        elif getHandValue(player_cards) == 21 and playing:
+            playing = False
+            session["playing"] = playing
+            session["winMessage"] = "You win!"
+            winMessage = "You win!"
+            addCoins(20)
+        
+        if playing:
+            revealed=False
+
+
+        winMessage = session["winMessage"]
+
+        if revealed:
+            botValue = getHandValue(bot_cards)
+            session["gameOver"] = True
+        else:
+            revealedCards = []
+            for i in range(len(bot_cards)):
+                if i != 0:
+                    revealedCards.append(bot_cards[i])
+            botValue = getHandValue(revealedCards)
+
+        return render_template('play.html', player_hand=player_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage, playerValue=getHandValue(player_cards), botValue=botValue)
     else:
         startGame()
         return redirect('/play')
@@ -171,11 +208,91 @@ def stopPlaying():
 
 @app.route('/new_game')
 def newGame():
-    # TODO: Add a check for whether the player's game is done, and keep them on the same game if they press the button but aren't done, since if they could press the button
-    # and start a new game, without being done with their current one, they could just start a ton of new games until they start with a really good hand
-    # if done:
-    games.delete_one({'playerid':session['user_data']['id']})
+    if "gameOver" in session:
+        gameOver = session["gameOver"]
+        if gameOver:
+            games.delete_one({'uid':session['user_data']['id']})     
     return redirect('/play')
+
+
+# Intending to use AJAX later to prevent the entire webpage from reloading for the user every time they choose hit or stand
+@app.route('/action', methods=['POST'])
+def action():
+    playing = session["playing"]
+    new_cards = None
+    gameOver = None
+    busted = False
+    revealed = False
+
+    for i in games.find({'uid':session['user_data']['id']}):
+        game = i
+    
+    if game:
+        player_cards = game["player_hand"]
+        bot_cards = game["bot_hand"]
+
+        userAction = request.form.get("action")
+        
+
+        new_cards, isPlaying = playerAction(userAction,player_cards,bot_cards)
+        if isPlaying == -1:
+            isPlaying = False
+            busted = True
+        
+        playing = isPlaying
+        session["playing"] = isPlaying
+        
+        if new_cards != 0:
+            updatePlayerHand(new_cards)
+        else:
+            return redirect('/play')
+        
+    else:
+        startGame()
+        return redirect('/play')
+    
+    winMessage = session["winMessage"]
+    
+    if not playing and not busted:
+        revealed = True
+        bot_cards, gameOver = botAction(player_cards, bot_cards)
+        updateBotHand(bot_cards)
+    if busted:
+        session["gameOver"] = True
+        winMessage = "Busted!"
+        revealed = True
+    
+    if gameOver == 1:
+        winMessage = "Bot wins!"
+    if gameOver == 0:
+        winMessage = "Tie!"
+        addCoins(5)
+    if gameOver == -1:
+        winMessage = "You win!"
+        addCoins(10)
+    
+    session["winMessage"] = winMessage
+
+    if revealed:
+        botValue = getHandValue(bot_cards)
+        session["gameOver"] = True
+    else:
+        revealedCards = []
+        for i in range(len(bot_cards)):
+            if i != 0:
+                revealedCards.append(bot_cards[i])
+        botValue = getHandValue(revealedCards)
+    
+    return render_template('play.html', player_hand=new_cards, bot_hand=bot_cards, revealed=revealed, playing=playing, winMessage=winMessage, playerValue=getHandValue(new_cards), botValue=botValue)
+
+@app.route('/buy',methods=['POST'])
+def buyItem():
+    if getCoins() >= int(request.form["itemValue"]):
+        addCoins(-int(request.form["itemValue"]))
+        print("Bought "+request.form["boughtItemId"]+" Successfully!")
+    else:
+        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
+    return redirect('/shop',code=302)
 
 
 #the tokengetter is automatically called to check who is logged in.
@@ -209,14 +326,15 @@ def addCoins(amount):
         return False
     
     if 'coins' not in session:
-        return False
-    
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
-    
+        coins = getCoins()
+        if coins:
+            session["coins"] = coins
+        else:
+            session["coins"] = 0
     
     try:
-        newAmount = session['coins'] + amount;
+        newAmount = int(session['coins']) + amount
+        session["coins"] = newAmount
         query = {'uid':session['user_data']['id']}
         changes = {'$set': {'coins': newAmount}}
         users.update_one(query, changes)
@@ -232,12 +350,6 @@ def setCoins(amount):
     if 'coins' not in session:
         return False
     
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
-    
-    for i in users.find({'uid':session['user_data']['id']}):
-        user = i
-    
     try:
         query = {'uid':session['user_data']['id']}
         changes = {'$set': {'coins': amount}}
@@ -247,28 +359,35 @@ def setCoins(amount):
         return False
         
         
-@app.route('/buy',methods=['POST'])
-def buyItem():
-    if getCoins() >= int(request.form["itemValue"]):
-        addCoins(int(request.form["itemValue"]))
-        print("Bought "+request.form["boughtItemId"]+" Successfully!")
-    else:
-        print("Not enough coins to buy "+request.form["boughtItemId"]+"!")
-    return redirect('/shop',code=302)
 
 
 
 def startGame():
     botHand = getCards(2, None)
     playerHand = getCards(2, botHand)
-    newGame = {"playerid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
+    newGame = {"uid": session['user_data']['id'], "bot_hand": botHand, "player_hand": playerHand}
     games.insert_one(newGame)
+    session["playing"] = True
+    session["winMessage"] = ""
+    session["gameOver"] = False
+
+
 
 def getCards(numCards, usedCards):
     cards = []
     newDeck = copy.deepcopy(deck) # Making a deep copy to manipulate to prevent the deck List from changing
     random.shuffle(newDeck)
-    
+
+    # if session["user_data"]["id"] == 160991266:
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     cards.append("AS")
+    #     return cards
+
     if usedCards is not None:
         for i in usedCards:
             newDeck.remove(i)
@@ -284,6 +403,122 @@ def getCards(numCards, usedCards):
         
     
     return cards
+
+
+# Updates the player's hand on MongoDB
+def updatePlayerHand(hand):
+    changes = {'$set':{"player_hand": hand}}
+    query = {"uid":session["user_data"]["id"]}
+
+    games.update_one(query, changes)
+    return True
+
+
+# Updates the bot's hand on MongoDB
+def updateBotHand(hand):
+    changes = {'$set':{"bot_hand": hand}}
+    query = {"uid":session["user_data"]["id"]}
+    games.update_one(query, changes)
+
+
+
+
+# Returns the next game state when the player takes a given action (either hit or stand, for now -- will probably add double and split options later)
+# Returns -1 if player has busted, or returns the player's new hand if not along with a boolean for whether or not the bot should take its action
+#Returns 0 if the player takes no action
+def playerAction(action, playerHand, botHand):
+    if action == "hit":
+        playerHand += getCards(1, playerHand + botHand)
+        value = getHandValue(playerHand)
+        
+        if value == 21:
+            return playerHand, False
+        elif value > 21:
+            return playerHand, -1
+        else:
+            return playerHand, True
+    
+    if action == "stand":
+        value = getHandValue(playerHand)
+        return playerHand, False
+    return 0,0
+    
+# Returns 1 if the bot won, -1 if it lost, and 0 if it tied, along with the bot's new hand
+def botAction(playerHand, botHand):
+    player = getHandValue(playerHand)
+    bot = getHandValue(botHand)
+    while bot <= 16:
+        botHand += getCards(1, playerHand + botHand)
+        bot = getHandValue(botHand)
+    
+
+    
+    if bot > 21:
+        return botHand, -1
+    
+    if bot > player:
+        return botHand, 1
+    
+    if bot == player:
+        return botHand, 0
+    
+    if bot < player:
+        return botHand, -1
+    
+    return botHand, 0
+
+    
+    
+    
+
+# Gets the value of a single card, returns 11 by default for an ace and 10 for face cards
+def getCardValue(card):
+    value = card[0]
+    
+    if value == 'A':
+        return 11
+    if value == 'K':
+        return 10
+    if value == 'Q':
+        return 10
+    if value == 'J':
+        return 10
+    if card[0] + card[1] == '10':
+        return 10
+    
+    return int(value)
+    
+    
+
+# Gets the value of a given hand of cards, uses 1 or 11 for an ace depending on the value of the rest of the hand, with 11 as default
+def getHandValue(hand):
+    value = 0
+    aces = []
+    
+    for card in hand:
+        if card[0] != 'A':
+            value += getCardValue(card)
+        else:
+            aces.append(card)
+    
+    # Should work better when handling many aces, however this isn't important unless there are multiple decks
+    numAces = len(aces)
+    while numAces > 0:
+        if value + (11 * numAces) > 21:
+            value += 1
+        else:
+            value += 11
+        numAces -= 1
+    
+    # for ace in aces:
+    #     if value + 11 > 21:
+    #         value += 1
+    #     else:
+    #         value += 11
+    
+    
+    return value
+
 
 
 if __name__ == '__main__':
