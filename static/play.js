@@ -35,11 +35,13 @@ $(document).ready(function() {
 function reload(data) {
 	// $(".cardContainer").load(location.href + " .cardContainer"); //reloads action buttons in case the player click stand
 	var cardContainer = $(data).find(".cardContainer").html();
+	var coins = $(data).find(".coins").html();
 	var newGameContainer = $(data).find(".newGameContainer").html();
 	var standButton = $(data).find(".standButtonContainer").html();
 	var hitButton = $(data).find(".hitButtonContainer").html();
 
 	$(".cardContainer").html(cardContainer);
+	$(".coins").html(coins);
 	$(".newGameContainer").html(newGameContainer);
 	$(".standButtonContainer").html(standButton);
 	$(".hitButtonContainer").html(hitButton);

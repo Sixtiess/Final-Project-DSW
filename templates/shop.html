@@ -4,69 +4,72 @@
 
 {% block content %}
 
-  <h1 class="center">Shop</h1>
-  <br>
-  <br>
-  <br>
-  
-  <br>
-  <div id="shopItemContainer">
-	<div class="center shopItem">
-		<div class="center shopItemCard">
-			<br>
-			<h3 class="center">Item: ____ coins</h3>
-			<br>
-			<div class="center">
-				<img class="shopItemImage" src="static/sunset-test-img.jpg">
+	<h1 class="center">Shop</h1>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<h3>Coins: {{ coins }}</h3>
+	<br>
+	<br>
+	<div id="shopItemContainer">
+		<div class="center shopItem">
+			<div class="center shopItemCard">
+				<br>
+				<h3 class="center">Item: ____ coins</h3>
+				<br>
+				<div class="center">
+					<img class="shopItemImage" src="static/sunset-test-img.jpg">
+				</div>
+				<br>
+				<form action="/buy" method="post">
+				<div class="center">
+					<button type="submit">Buy</button>
+					<input type="hidden" name="boughtItemId" value="12345">
+					<input type="hidden" name="itemValue" value="10">
+				</div>
+				</form>
 			</div>
-			<br>
-			<form action="/buy" method="post">
-			<div class="center">
-				<button type="submit">Buy</button>
-				<input type="hidden" name="boughtItemId" value="12345">
-				<input type="hidden" name="itemValue" value="10">
-			</div>
-			</form>
 		</div>
-	</div>
-	<div class="center shopItem">
-		<div class="center shopItemCard">
-			<br>
-			<h3 class="center">Item: ____ coins</h3>
-			<br>
-			<div class="center">
-				<img class="shopItemImage" src="static/sunset-test-img.jpg">
+		<div class="center shopItem">
+			<div class="center shopItemCard">
+				<br>
+				<h3 class="center">Item: ____ coins</h3>
+				<br>
+				<div class="center">
+					<img class="shopItemImage" src="static/sunset-test-img.jpg">
+				</div>
+				<br>
+				<form action="/buy" method="post">
+				<div class="center">
+					<button type="submit">Buy</button>
+					<input type="hidden" name="boughtItemId" value="23456">
+					<input type="hidden" name="itemValue" value="20">
+				</div>
+				</form>
 			</div>
-			<br>
-			<form action="/buy" method="post">
-			<div class="center">
-				<button type="submit">Buy</button>
-				<input type="hidden" name="boughtItemId" value="23456">
-				<input type="hidden" name="itemValue" value="20">
-			</div>
-			</form>
 		</div>
-	</div>
-	<div class="center shopItem">
-		<div class="center shopItemCard">
-			<br>
-			<h3 class="center">Item: ____ coins</h3>
-			<br>
-			<div class="center">
-				<img class="shopItemImage" src="static/sunset-test-img.jpg">
+		<div class="center shopItem">
+			<div class="center shopItemCard">
+				<br>
+				<h3 class="center">Item: ____ coins</h3>
+				<br>
+				<div class="center">
+					<img class="shopItemImage" src="static/sunset-test-img.jpg">
+				</div>
+				<br>
+				<form action="/buy" method="post">
+				<div class="center">
+					<button type="submit">Buy</button>
+					<input type="hidden" name="boughtItemId" value="34567">
+					<input type="hidden" name="itemValue" value="30">
+				</div>
+				</form>
 			</div>
-			<br>
-			<form action="/buy" method="post">
-			<div class="center">
-				<button type="submit">Buy</button>
-				<input type="hidden" name="boughtItemId" value="34567">
-				<input type="hidden" name="itemValue" value="30">
-			</div>
-			</form>
 		</div>
+		
 	</div>
-	
-  </div>
   
   
   

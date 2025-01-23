@@ -71,6 +71,10 @@ except Exception as e:
 def inject_logged_in():
     return {"logged_in":('github_token' in session)}
 
+@app.context_processor
+def inject_coins():
+    return {"coins":(getCoins())}
+
 @app.route('/')
 def home():
     if 'github_token' in session:
